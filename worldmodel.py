@@ -54,7 +54,7 @@ def add_entity(world, entity):
    if within_bounds(world, pt):
       old_entity = occ_grid.get_cell(world.occupancy, pt)
       if old_entity != None:
-         entities.clear_pending_actions(old_entity)
+         old_entity.clear_pending_actions()
       occ_grid.set_cell(world.occupancy, pt, entity)
       world.entities.append(entity)
 
