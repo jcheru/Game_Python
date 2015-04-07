@@ -43,14 +43,14 @@ def distance_sq(p1, p2):
 
 
 def find_nearest(world, pt, type):
-   oftype = [(e, distance_sq(pt, entities.get_position(e)))
+   oftype = [(e, distance_sq(pt, e.get_position()))
       for e in world.entities if isinstance(e, type)]
 
    return nearest_entity(oftype)
 
 
 def add_entity(world, entity):
-   pt = entities.get_position(entity)
+   pt = entity.get_position()
    if within_bounds(world, pt):
       old_entity = occ_grid.get_cell(world.occupancy, pt)
       if old_entity != None:
@@ -62,7 +62,7 @@ def add_entity(world, entity):
 def move_entity(world, entity, pt):
    tiles = []
    if within_bounds(world, pt):
-      old_pt = entities.get_position(entity)
+      old_pt = entity.get_position()
       occ_grid.set_cell(world.occupancy, old_pt, None)
       tiles.append(old_pt)
       occ_grid.set_cell(world.occupancy, pt, entity)
@@ -73,7 +73,7 @@ def move_entity(world, entity, pt):
 
 
 def remove_entity(world, entity):
-   remove_entity_at(world, entities.get_position(entity))
+   remove_entity_at(world, entity.get_position())
 
 
 def remove_entity_at(world, pt):
