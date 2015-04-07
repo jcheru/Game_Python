@@ -44,8 +44,8 @@ def next_position(world, entity_pt, dest_pt):
          new_pt = point.Point(entity_pt.x, entity_pt.y)
 
    return new_pt
-#
 
+   
 def blob_next_position(world, entity_pt, dest_pt):
    horiz = sign(dest_pt.x - entity_pt.x)
    new_pt = point.Point(entity_pt.x + horiz, entity_pt.y)
