@@ -66,7 +66,7 @@ def handle_mouse_motion(view, event):
 def handle_keydown(view, event, i_store, world, entity_select):
    (view_delta, entity_select) = on_keydown(event, world,
       entity_select, i_store)
-   worldview.update_view(view, view_delta,
+   view.update_view(view_delta,
       image_store.get_images(i_store, entity_select)[0])
 
    return entity_select

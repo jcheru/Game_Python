@@ -35,7 +35,7 @@ def handle_mouse_motion(view, event):
 
 def handle_keydown(view, event):
    view_delta = on_keydown(event)
-   worldview.update_view(view, view_delta)
+   view.update_view(view_delta)
 
 
 def activity_loop(view, world):

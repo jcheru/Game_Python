@@ -19,7 +19,28 @@ class WorldView:
       self.num_rows = world.num_rows
       self.num_cols = world.num_cols
       self.mouse_img = mouse_img
-
+   def draw_background(self):
+      for y in range(0, self.viewport.height):
+         for x in range(0, self.viewport.width):
+            w_pt = viewport_to_world(self.viewport, point.Point(x, y))
+            img = self.world.get_background_image(w_pt)
+            self.screen.blit(img, (x * self.tile_width, y * self.tile_height))
+   def draw_entities(self):
+      for entity in self.world.entities:
+         if self.viewport.collidepoint(entity.position.x, entity.position.y):
+            v_pt = world_to_viewport(self.viewport, entity.position)
+            self.screen.blit(entity.get_image(),
+               (v_pt.x * self.tile_width, v_pt.y * self.tile_height))
+   def draw_viewport(self):
+      self.draw_background()
+      self.draw_entities()
+   def update_view(self, view_delta=(0,0), mouse_img=None):
+      self.viewport = create_shifted_viewport(self.viewport, view_delta,
+         self.num_rows, self.num_cols)
+      self.mouse_img = mouse_img
+      self.draw_viewport()
+      pygame.display.update()
+      mouse_move(self, self.mouse_pt)
 
 def viewport_to_world(viewport, pt):
    return point.Point(pt.x + viewport.left, pt.y + viewport.top)
@@ -40,34 +61,10 @@ def create_shifted_viewport(viewport, delta, num_rows, num_cols):
    return pygame.Rect(new_x, new_y, viewport.width, viewport.height)
 
 
-def draw_background(view):
-   for y in range(0, view.viewport.height):
-      for x in range(0, view.viewport.width):
-         w_pt = viewport_to_world(view.viewport, point.Point(x, y))
-         img = view.world.get_background_image(w_pt)
-         view.screen.blit(img, (x * view.tile_width, y * view.tile_height))
 
 
-def draw_entities(view):
-   for entity in view.world.entities:
-      if view.viewport.collidepoint(entity.position.x, entity.position.y):
-         v_pt = world_to_viewport(view.viewport, entity.position)
-         view.screen.blit(entity.get_image(),
-            (v_pt.x * view.tile_width, v_pt.y * view.tile_height))
 
 
-def draw_viewport(view):
-   draw_background(view)
-   draw_entities(view)
-
-
-def update_view(view, view_delta=(0,0), mouse_img=None):
-   view.viewport = create_shifted_viewport(view.viewport, view_delta,
-      view.num_rows, view.num_cols)
-   view.mouse_img = mouse_img
-   draw_viewport(view)
-   pygame.display.update()
-   mouse_move(view, view.mouse_pt)
 
 
 def update_view_tiles(view, tiles):
