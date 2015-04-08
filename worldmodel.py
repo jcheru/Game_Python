@@ -43,7 +43,7 @@ def distance_sq(p1, p2):
 
 
 def find_nearest(world, pt, type):
-   oftype = [(e, distance_sq(pt, entity.get_position()))
+   oftype = [(e, distance_sq(pt, e.get_position()))
       for e in world.entities if isinstance(e, type)]
 
    return nearest_entity(oftype)
@@ -107,7 +107,8 @@ def update_on_time(world, ticks):
 
 def get_background_image(world, pt):
    if within_bounds(world, pt):
-      return entities.get_image(occ_grid.get_cell(world.background, pt))
+      entity = occ_grid.get_cell(world.background, pt)
+      return entity.get_image()
 
 
 def get_background(world, pt):
