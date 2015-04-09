@@ -39,6 +39,3 @@ class ListItem:
 
    def __eq__(a, b):
       return a.item == b.item and a.ord == b.ord
-
-
-

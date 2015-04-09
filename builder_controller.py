@@ -33,16 +33,6 @@ def mouse_to_tile(pos, tile_width, tile_height):
    return point.Point(pos[0] // tile_width, pos[1] // tile_height)
 
 
-def save_world(world, filename):
-   with open(filename, 'w') as file:
-      save_load.save_world(world, file)
-
-
-def load_world(world, i_store, filename):
-   with open(filename, 'r') as file:
-      save_load.load_world(world, i_store, file)
-
-
 def on_keydown(event, world, entity_select, i_store):
    x_delta = 0
    y_delta = 0
