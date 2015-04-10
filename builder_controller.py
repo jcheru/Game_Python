@@ -48,19 +48,6 @@ def on_keydown(event, world, entity_select, i_store):
    return ((x_delta, y_delta), entity_select)
 
 
-def handle_mouse_motion(view, event):
-   mouse_pt = mouse_to_tile(event.pos, view.tile_width, view.tile_height)
-   view.mouse_move(mouse_pt)
-
-
-def handle_keydown(view, event, i_store, world, entity_select):
-   (view_delta, entity_select) = on_keydown(event, world,
-      entity_select, i_store)
-   view.update_view(view_delta,
-      image_store.get_images(i_store, entity_select)[0])
-
-   return entity_select
-
 
 def create_new_entity(pt, entity_select, i_store):
    name = entity_select + '_' + str(pt.x) + '_' + str(pt.y)
@@ -89,27 +76,6 @@ def is_background_tile(entity_select):
    return entity_select in BACKGROUND_TAGS
 
 
-def handle_mouse_button(view, world, event, entity_select, i_store):
-   mouse_pt = mouse_to_tile(event.pos, view.tile_width, view.tile_height)
-   tile_view_pt = worldview.viewport_to_world(view.viewport, mouse_pt)
-   if event.button == mouse_buttons.LEFT and entity_select:
-      if is_background_tile(entity_select):
-         world.set_background(tile_view_pt,
-            entities.Background(entity_select,
-               image_store.get_images(i_store, entity_select)))
-         return [tile_view_pt]
-      else:
-         new_entity = create_new_entity(tile_view_pt, entity_select, i_store)
-         if new_entity:
-            world.remove_entity_at(tile_view_pt)
-            world.add_entity(new_entity)
-            return [tile_view_pt]
-   elif event.button == mouse_buttons.RIGHT:
-      world.remove_entity_at(tile_view_pt)
-      return [tile_view_pt]
-
-   return []
-
 
 def activity_loop(view, world, i_store):
    pygame.key.set_repeat(keys.KEY_DELAY, keys.KEY_INTERVAL)
@@ -120,12 +86,11 @@ def activity_loop(view, world, i_store):
          if event.type == pygame.QUIT:
             return
          elif event.type == pygame.MOUSEMOTION:
-            handle_mouse_motion(view, event)
+            view.handle_mouse_motion(event)
          elif event.type == pygame.MOUSEBUTTONDOWN:
-            tiles = handle_mouse_button(view, world, event, entity_select,
+            tiles = view.handle_mouse_button(world, event, entity_select,
                i_store)
             view.update_view_tiles(tiles)
          elif event.type == pygame.KEYDOWN:
-            entity_select = handle_keydown(view, event, i_store, world,
+            entity_select = view.handle_keydown(event, i_store, world,
                entity_select)
-
