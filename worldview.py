@@ -99,35 +99,6 @@ class WorldView:
 
       pygame.display.update(rects)
 
-   def handle_mouse_motion(self, event):
-      mouse_pt = mouse_to_tile(event.pos, self.tile_width, self.tile_height)
-      self.mouse_move(mouse_pt)
-   def handle_keydown(self, event, i_store, world, entity_select):
-      (view_delta, entity_select) = on_keydown(event, world,
-         entity_select, i_store)
-      self.update_view(view_delta,
-         image_store.get_images(i_store, entity_select)[0])
-
-      return entity_select
-   def handle_mouse_button(self, world, event, entity_select, i_store):
-      mouse_pt = mouse_to_tile(event.pos, self.tile_width, self.tile_height)
-      tile_view_pt = viewport_to_world(self.viewport, mouse_pt)
-      if event.button == mouse_buttons.LEFT and entity_select:
-         if is_background_tile(entity_select):
-            world.set_background(tile_view_pt,
-               entities.Background(entity_select,
-                  image_store.get_images(i_store, entity_select)))
-            return [tile_view_pt]
-         else:
-            new_entity = create_new_entity(tile_view_pt, entity_select, i_store)
-            if new_entity:
-               world.remove_entity_at(tile_view_pt)
-               world.add_entity(new_entity)
-               return [tile_view_pt]
-      elif event.button == mouse_buttons.RIGHT:
-         world.remove_entity_at(tile_view_pt)
-         return [tile_view_pt]
-      return []
 
 #helper functions for above class
 
@@ -148,27 +119,4 @@ def create_shifted_viewport(viewport, delta, num_rows, num_cols):
    new_y = clamp(viewport.top + delta[1], 0, num_rows - viewport.height)
 
    return pygame.Rect(new_x, new_y, viewport.width, viewport.height)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

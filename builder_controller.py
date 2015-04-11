@@ -29,8 +29,19 @@ SMITH_RATE_MIN = 2000
 SMITH_RATE_MAX = 4000
 
 
+
 def mouse_to_tile(pos, tile_width, tile_height):
    return point.Point(pos[0] // tile_width, pos[1] // tile_height)
+
+
+def save_world(world, filename):
+   with open(filename, 'w') as file:
+      save_load.save_world(world, file)
+
+
+def load_world(world, i_store, filename):
+   with open(filename, 'r') as file:
+      self.load_world(world, i_store, file)
 
 
 def on_keydown(event, world, entity_select, i_store):
@@ -48,6 +59,18 @@ def on_keydown(event, world, entity_select, i_store):
    return ((x_delta, y_delta), entity_select)
 
 
+def handle_mouse_motion(view, event):
+   mouse_pt = mouse_to_tile(event.pos, view.tile_width, view.tile_height)
+   worldview.mouse_move(view, mouse_pt)
+
+
+def handle_keydown(view, event, i_store, world, entity_select):
+   (view_delta, entity_select) = on_keydown(event, world,
+      entity_select, i_store)
+   worldview.update_view(view, view_delta,
+      image_store.get_images(i_store, entity_select)[0])
+
+   return entity_select
 
 def create_new_entity(pt, entity_select, i_store):
    name = entity_select + '_' + str(pt.x) + '_' + str(pt.y)
@@ -75,6 +98,26 @@ def create_new_entity(pt, entity_select, i_store):
 def is_background_tile(entity_select):
    return entity_select in BACKGROUND_TAGS
 
+
+def handle_mouse_button(view, world, event, entity_select, i_store):
+   mouse_pt = mouse_to_tile(event.pos, view.tile_width, view.tile_height)
+   tile_view_pt = worldview.viewport_to_world(view.viewport, mouse_pt)
+   if event.button == mouse_buttons.LEFT and entity_select:
+      if is_background_tile(entity_select):
+         worldmodel.set_background(world, tile_view_pt,
+            entities.Background(entity_select,
+               image_store.get_images(i_store, entity_select)))
+         return [tile_view_pt]
+      else:
+         new_entity = create_new_entity(tile_view_pt, entity_select, i_store)
+         if new_entity:
+            worldmodel.remove_entity_at(world, tile_view_pt)
+            worldmodel.add_entity(world, new_entity)
+            return [tile_view_pt]
+   elif event.button == mouse_buttons.RIGHT:
+      worldmodel.remove_entity_at(world, tile_view_pt)
+      return [tile_view_pt]
+   return []
 
 
 def activity_loop(view, world, i_store):

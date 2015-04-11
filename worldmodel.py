@@ -131,13 +131,6 @@ class WorldModel:
       elif isinstance(entity, entities.Ore):
          actions.schedule_ore(self, entity, 0, i_store)         
 
-   def save_world2(self, filename):
-      with open(filename, 'w') as file:
-         self.save_world(file)
-   def load_world2(self, i_store, filename):
-      with open(filename, 'r') as file:
-         self.load_world(i_store, file)
-
 #these functions help above methods
 
 def nearest_entity(entity_dists):
