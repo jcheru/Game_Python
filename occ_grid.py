@@ -15,11 +15,9 @@ class Grid:
          self.cells.append([])
          for col in range(0, self.width):
             self.cells[row].append(occupancy_value)
+   def set_cell(self, point, value):
+      self.cells[point.y][point.x] = value
+   def get_cell(self, point):
+      return self.cells[point.y][point.x]
 
-def set_cell(grid, point, value):
-   grid.cells[point.y][point.x] = value
-
-
-def get_cell(grid, point):
-   return grid.cells[point.y][point.x]
 

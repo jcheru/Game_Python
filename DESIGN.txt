@@ -1,0 +1,269 @@
+class: Background
+methods:
+   get_name
+   get_images
+   get_image
+
+class: MinerNotFull
+methods:
+   set_position
+   get_position
+   get_images
+   get_image
+   get_rate
+   set_resource_count
+   get_resource_count
+   get_resource_limit
+   get_name
+   get_animation_rate
+   remove_pending_action
+   add_pending_action
+   get_pending_action
+   clear_pending_actions
+   next_image
+   entity_string
+   miner_to_ore
+   miner_to_smith
+   create_miner_action
+   try_transform_miner_not_full
+   try_transform_miner
+   create_animation_action
+   remove_entity
+
+class: MinerFull
+methods:
+   set_position
+   get_position
+   get_images
+   get_image
+   get_rate
+   set_resource_count
+   get_resource_count
+   get_resource_limit
+   get_name
+   get_animation_rate
+   remove_pending_action
+   add_pending_action
+   get_pending_action
+   clear_pending_actions
+   next_image
+   entity_string
+   miner_to_ore
+   miner_to_smith
+   create_miner_action
+   try_transform_miner_full
+   try_transform_miner
+   create_animation_action
+   remove_entity
+
+class: Vein
+methods:
+   set_position
+   get_position
+   get_images
+   get_image
+   get_rate
+   get_resource_distance
+   get_name
+   remove_pending_action
+   add_pending_action
+   get_pending_action
+   clear_pending_actions
+   next_image
+   entity_string
+   create_vein_action
+   create_animation_action
+   remove_entity
+
+class: Ore
+methods:
+   set_position
+   get_position
+   get_images
+   get_image
+   get_rate
+   get_name
+   remove_pending_action
+   add_pending_action
+   get_pending_action
+   clear_pending_actions
+   next_image
+   entity_string
+   create_animation_action
+   remove_entity
+   create_ore_transform_action
+
+class: Blacksmith
+methods:
+   set_position
+   get_position
+   get_images
+   get_image
+   get_rate
+   set_resource_count
+   get_resource_count
+   get_resource_limit
+   get_resource_distance
+   get_name
+   remove_pending_action
+   add_pending_action
+   get_pending_action
+   clear_pending_actions
+   next_image
+   entity_string
+   create_animation_action
+   remove_entity
+
+class: Obstacle
+methods:
+   set_position
+   get_position
+   get_images
+   get_image
+   get_name
+   next_image
+   entity_string
+
+class: OreBlob
+methods:
+   set_position
+   get_position
+   get_images
+   get_image
+   get_name
+   get_animation_rate
+   remove_pending_action
+   add_pending_action
+   get_pending_actions
+   clear_pending_actions
+   next_image
+   entity_string
+   blob_to_vein
+   create_ore_blob_action
+   create_animation_action
+   remove_entity
+
+class: Quake
+methods:
+   set_position
+   get_position
+   get_images
+   get_image
+   get_name
+   get_animation_rate
+   remove_pending_action
+   add_pending_action
+   get_pending_actions
+   clear_pending_actions
+   next_image
+   entity_string
+   create_animation_action
+   create_entity_death_action
+   remove_entity
+
+class: Grid
+methods:
+   set_cell
+   get_cell
+
+class: OrderedList
+methods:
+   insert
+   remove
+   head
+   pop
+
+class: ListItem   
+no methods (just init and eq)
+
+class: WorldModel
+methods:
+   within_bounds
+   is_occupied
+   find_nearest
+   add_entity
+   move_entity
+   remove_entity
+   remove_entity_at
+   scheudle_action
+   unschedule_action
+   update_on_time
+   get_background_image
+   get_background
+   set_background
+   get_tile_occupant
+   get_entities
+   schedule_entity
+
+class: WorldView
+methods:
+   draw_background
+   draw_entities
+   draw_viewport
+   update_view
+   update_view_tiles
+   update_tile
+   get_tile_image
+   create_mouse_surface
+   update_mouse_cursor
+   mouse_move
+
+FUNCTIONS:
+
+actions.py:
+   next_postion, blob_next_position, find_open_around
+      These functions help methods from classes in the entities.py file.
+      While they help those methods, they are not really a behavior of the entity.
+
+   create_blob, create_ore, create_quake, create_vein, clear_pending_actions
+      These functions create the entities, so it wouldn't really need to be made into a method.
+
+   schedule_blob, schedule_miner, schedule_ore, schedule_quake, schedule_vein, schedule_action, schedule_animation
+      These functions schedule actions that the entities do, but they aren't really actions themselves.  They are pretty much helper functions
+
+   clear_pending_actions
+      it calls the entity's clear_pending_
+
+builder.py
+	create_default_background, main
+	   There was no logical place to put these functions
+
+builder_controller.py
+   save_world, load_world
+      Since these functions deal with writing / reading from another file, it makes sense to keep it separate from Classes
+
+   mouse_to_tile, on_keydown, handle_mouse_motion, handle_keydown, create_new_entity, is_background_tile, handle_moouse_button
+      There was no logical place to put these functions.  They deal with control, so they should stay in the builder_controller.py file
+
+   activity_loop
+      It is used in setting up pygame and there is no logical place to put the function
+
+controller.py
+   on_keydown, mouse_to_tile, handle_timer_event, hande_mouse_motion
+   handle_keydown
+      These functions deal with controlling the mouse, so it makes sense to keep it in the controller.py file.
+      It wouldn't make sense to put it in a class
+   activity_loop
+      It is used in setting up pygame and there is no logical place to put the function
+
+save_load.py
+   save_world, save_entities, save_background, load_world
+      These functions deal with reading and writing from another file, so it makes sense to keep it where it is
+   add_background, add_entity, create_from_properties, create_miner, create_vein, create_ore, create_blacksmith, create_obstacle
+      These functions have no reasonable classes to go to
+
+image_store.py
+   create_default_image, load_images, process_image_line, get_images_internal, get_images
+      These functions have no reasonable classes to go 
+
+worldmodel.py
+   nearest_entity, distance_sq
+      These functions are not really part of the World class, they are just helper functions
+
+worldview.py
+   viewport_to_world, world_to_viewport, clamp, create_shifted_viewport
+      These functions are not really part of the View class, they are just helper functions
+
+main.py
+   create_default_background, load_world, main
+      There is no place for these functions to go

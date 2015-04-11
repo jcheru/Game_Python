@@ -714,6 +714,3 @@ class Quake:
       world.remove_entity(self)
 
 
-# This is a less than pleasant file format, but structured based on
-# material covered in course.  Something like JSON would be a
-# significant improvement.
