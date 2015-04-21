@@ -3,7 +3,7 @@ import point
 
 BLOB_RATE_SCALE = 4
 
-class Background:
+class Entity(object):
    def __init__(self, name, imgs):
       self.name = name
       self.imgs = imgs
@@ -15,14 +15,16 @@ class Background:
    def get_image(self):
       return self.imgs[self.current_img]
 
-class Miner(object):
+class Background(Entity):
+   def __init__(self, name, imgs):
+   	   super(Background, self).__init__(name, imgs)
+
+class Miner(Entity):
    def __init__(self, name, resource_limit, position, rate, imgs,
       animation_rate):
-      self.name = name
+      super(Miner, self).__init__(name, imgs)
       self.position = position
       self.rate = rate
-      self.imgs = imgs
-      self.current_img = 0
       self.resource_limit = resource_limit
       self.animation_rate = animation_rate
       self.pending_actions = []
@@ -62,34 +64,6 @@ class Miner(object):
          self.pending_actions = []
    def next_image(self):
       self.current_img = (self.current_img + 1) % len(self.imgs)
-
-   def miner_to_ore(self, world, ore):
-      entity_pt = self.get_position()
-      if not ore:
-         return ([entity_pt], False)
-      ore_pt = ore.get_position()
-      if entity_pt.adjacent(ore_pt):
-         self.set_resource_count(
-            1 + self.get_resource_count())
-         ore.remove_entity(world)
-         return ([ore_pt], True)
-      else:
-         new_pt = actions.next_position(world, entity_pt, ore_pt)
-         return (world.move_entity(self, new_pt), False)
-   def miner_to_smith(self, world, smith):
-      entity_pt = self.get_position()
-      if not smith:
-         return ([entity_pt], False)
-      smith_pt = smith.get_position()
-      if entity_pt.adjacent(smith_pt):
-         smith.set_resource_count(
-            smith.get_resource_count() +
-            self.get_resource_count())
-         self.set_resource_count(0)
-         return ([], True)
-      else:
-         new_pt = actions.next_position(world, entity_pt, smith_pt)
-         return (world.move_entity(self, new_pt), False)
 
    def try_transform_miner(self, world, transform):
       new_entity = transform(world)
@@ -132,6 +106,20 @@ class MinerNotFull(Miner):
          str(entity.position.y), str(entity.resource_limit),
          str(entity.rate), str(entity.animation_rate)])
 
+   def miner_to_ore(self, world, ore):
+      entity_pt = self.get_position()
+      if not ore:
+         return ([entity_pt], False)
+      ore_pt = ore.get_position()
+      if entity_pt.adjacent(ore_pt):
+         self.set_resource_count(
+            1 + self.get_resource_count())
+         ore.remove_entity(world)
+         return ([ore_pt], True)
+      else:
+         new_pt = actions.next_position(world, entity_pt, ore_pt)
+         return (world.move_entity(self, new_pt), False)
+
    def create_miner_action(self, world, i_store):
       def action(current_ticks):
          self.remove_pending_action(action)
@@ -171,13 +159,28 @@ class MinerFull(Miner):
    def entity_string(self):
       return 'unknown'
 
+   def miner_to_smith(self, world, smith):
+      entity_pt = self.get_position()
+      if not smith:
+         return ([entity_pt], False)
+      smith_pt = smith.get_position()
+      if entity_pt.adjacent(smith_pt):
+         smith.set_resource_count(
+            smith.get_resource_count() +
+            self.get_resource_count())
+         self.set_resource_count(0)
+         return ([], True)
+      else:
+         new_pt = actions.next_position(world, entity_pt, smith_pt)
+         return (world.move_entity(self, new_pt), False)
+
    def create_miner_action(self, world, i_store):
       def action(current_ticks):
          self.remove_pending_action(action)
 
          entity_pt = self.get_position()
          smith = world.find_nearest(entity_pt, Blacksmith)
-         (tiles, found) = self.miner_to_ore(world, smith)
+         (tiles, found) = self.miner_to_smith(world, smith)
 
          new_entity = self
          if found:
@@ -198,13 +201,11 @@ class MinerFull(Miner):
 
       return new_entity
 
-class Vein:
+class Vein(Entity):
    def __init__(self, name, rate, position, imgs, resource_distance=1):
-      self.name = name
+      super(Vein, self).__init__(name, imgs)
       self.position = position
       self.rate = rate
-      self.imgs = imgs
-      self.current_img = 0
       self.resource_distance = resource_distance
       self.pending_actions = []
    def set_position(self, point):
@@ -282,12 +283,10 @@ class Vein:
       self.clear_pending_actions()
       world.remove_entity(self)
 
-class Ore:
+class Ore(Entity):
    def __init__(self, name, position, imgs, rate=5000):
-      self.name = name
+      super(Ore, self).__init__(name, imgs)
       self.position = position
-      self.imgs = imgs
-      self.current_img = 0
       self.rate = rate
       self.pending_actions = []
    def set_position(self, point):
@@ -322,20 +321,6 @@ class Ore:
       return ' '.join(['ore', entity.name, str(entity.position.x),
          str(entity.position.y), str(entity.rate)])
 
-   def create_animation_action(self, world, repeat_count):
-      def action(current_ticks):
-         self.remove_pending_action(action)
-
-         self.next_image()
-
-         if repeat_count != 1:
-            actions.schedule_action(world, self,
-               self.create_animation_action(world, max(repeat_count - 1, 0)),
-               current_ticks + self.get_animation_rate())
-
-         return [self.get_position()]
-      return action
-
    def remove_entity(self, world):
       for action in self.get_pending_actions():
          world.unschedule_action(action)
@@ -357,13 +342,11 @@ class Ore:
       return action
 
 
-class Blacksmith:
+class Blacksmith(Entity):
    def __init__(self, name, position, imgs, resource_limit, rate,
       resource_distance=1):
-      self.name = name
+      super(Blacksmith, self).__init__(name, imgs)
       self.position = position
-      self.imgs = imgs
-      self.current_img = 0
       self.resource_limit = resource_limit
       self.resource_count = 0
       self.rate = rate
@@ -410,32 +393,16 @@ class Blacksmith:
          str(entity.position.y), str(entity.resource_limit),
          str(entity.rate), str(entity.resource_distance)])
 
-   def create_animation_action(self, world, repeat_count):
-      def action(current_ticks):
-         self.remove_pending_action(action)
-
-         self.next_image()
-
-         if repeat_count != 1:
-            actions.schedule_action(world, self,
-               self.create_animation_action(world, max(repeat_count - 1, 0)),
-               current_ticks + self.get_animation_rate())
-
-         return [self.get_position()]
-      return action
-
    def remove_entity(self, world):
       for action in self.get_pending_actions():
          world.unschedule_action(action)
       self.clear_pending_actions()
       world.remove_entity(self)
 
-class Obstacle:
+class Obstacle(Entity):
    def __init__(self, name, position, imgs):
-      self.name = name
+      super(Obstacle, self).__init__(name, imgs)
       self.position = position
-      self.imgs = imgs
-      self.current_img = 0
    def set_position(self, point):
       self.position = point
    def get_position(self):
@@ -456,11 +423,9 @@ class Obstacle:
 
 class OreBlob:
    def __init__(self, name, position, rate, imgs, animation_rate):
-      self.name = name
+      super(OreBlob, self).__init__(name, imgs)
       self.position = position
       self.rate = rate
-      self.imgs = imgs
-      self.current_img = 0
       self.animation_rate = animation_rate
       self.pending_actions = []
    def set_position(self, point):
@@ -554,10 +519,8 @@ class OreBlob:
 
 class Quake:
    def __init__(self, name, position, imgs, animation_rate):
-      self.name = name
+      super(Quake, self).__init__(name, imgs)
       self.position = position
-      self.imgs = imgs
-      self.current_img = 0
       self.animation_rate = animation_rate
       self.pending_actions = []
    def set_position(self, point):
@@ -618,5 +581,3 @@ class Quake:
          world.unschedule_action(action)
       self.clear_pending_actions()
       world.remove_entity(self)
-
-
